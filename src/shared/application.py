@@ -72,7 +72,7 @@ class MESHLambdaApplication(LambdaApplication):
         """
         if not lock_name or not execution_id:
             self.log_object.write_log(
-                "MESHLOCK0007",
+                "MESHLOCK0006",
                 None,
                 {"lock_name": lock_name, "owner_id": execution_id},
             )
@@ -113,6 +113,14 @@ class MESHLambdaApplication(LambdaApplication):
         Attempting to release a lock which isn't owned by execution_id will be denied and will result in a
         non-terminal warning.
         """
+        if not lock_name or not execution_id:
+            self.log_object.write_log(
+                "MESHLOCK0007",
+                None,
+                {"lock_name": lock_name, "owner_id": execution_id},
+            )
+            return
+
         try:
             self.log_object.write_log(
                 "MESHLOCK0002",

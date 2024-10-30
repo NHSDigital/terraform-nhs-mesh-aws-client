@@ -11,6 +11,7 @@ from .constants import (
     FETCH_LOG_GROUP,
     GET_MESSAGES_SFN_ARN,
     LOCAL_MAILBOXES,
+    LOCK_LOG_GROUP,
     POLL_FUNCTION,
     POLL_LOG_GROUP,
 )
@@ -152,7 +153,7 @@ def test_invoke_get_when_message_exists(
 
 
 def test_trigger_step_function_get_messages_pagination(
-    mesh_client_one: MeshClient, sfn: SFNClient
+    mesh_client_one: MeshClient, sfn: SFNClient, local_lock_table: Table
 ):
     wait_till_not_running(state_machine_arn=GET_MESSAGES_SFN_ARN, sfn=sfn)
 
@@ -171,7 +172,11 @@ def test_trigger_step_function_get_messages_pagination(
 
     with CloudwatchLogsCapture(
         log_group=POLL_LOG_GROUP
-    ) as poll_cw, CloudwatchLogsCapture(log_group=FETCH_LOG_GROUP) as fetch_cw:
+    ) as poll_cw, CloudwatchLogsCapture(
+        log_group=FETCH_LOG_GROUP
+    ) as fetch_cw, CloudwatchLogsCapture(
+        log_group=LOCK_LOG_GROUP
+    ) as lock_cw:
         execution = sfn.start_execution(
             stateMachineArn=GET_MESSAGES_SFN_ARN,
             name=uuid4().hex,
@@ -193,12 +198,22 @@ def test_trigger_step_function_get_messages_pagination(
             predicate=lambda x: x.get("logReference") == "LAMBDA0003",
             min_results=len(sent_message_ids),
         )
+        lock_cw.wait_for_logs(
+            predicate=lambda x: x.get("logReference") == "LAMBDA0003",
+        )
 
         poll_logs = poll_cw.find_logs(parse_logs=True)
         fetch_logs = fetch_cw.find_logs(parse_logs=True)
+        lock_logs = lock_cw.find_logs(parse_logs=True)
 
-        logs = poll_logs + fetch_logs
+        logs = poll_logs + fetch_logs + lock_logs
         assert logs
+
+        remove_lock_log = next(
+            log for log in logs if log["logReference"] == "MESHLOCK0002"
+        )
+        lock_name = remove_lock_log["lock_name"]
+        assert not local_lock_table.get_item(Key={"LockName": lock_name}).get("Item")
 
         # We don't pass locking info in, so a warning is expected.
         assert_all_info_logs(logs, ["MESHLOCK0007"])
