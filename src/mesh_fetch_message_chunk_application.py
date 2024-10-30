@@ -129,18 +129,6 @@ class MeshFetchMessageChunkApplication(MESHLambdaApplication):
             if not self.should_release_lock:
                 return
 
-            if self.execution_id and self.lock_name:
-                self._release_lock(
-                    self.lock_name,
-                    self.execution_id,
-                )
-            else:
-                self.log_object.write_log(
-                    "MESHSEND0015",
-                    None,
-                    {"lock_name": self.lock_name, "owner_id": self.execution_id},
-                )
-
     def _retrieve_current_chunk(self):
         self._http_response = self.get_chunk(
             self.message_id, chunk_num=self.current_chunk

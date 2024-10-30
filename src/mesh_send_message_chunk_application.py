@@ -207,8 +207,6 @@ class MeshSendMessageChunkApplication(MESHLambdaApplication):
                 },
             )
 
-            self._release_lock(self.lock_name, self.execution_id)
-
         self.response["body"].update(
             {
                 "complete": complete,

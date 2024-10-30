@@ -125,6 +125,8 @@ class MeshPollMailboxApplication(MESHLambdaApplication):
             # Parameters for a follow-up iteration through the messages in this execution
             "mailbox": self.mailbox_id,
             "handshake": "false",  # No need to handshake again for this execution
+            "lock_name": lock_name,
+            "execution_id": self.execution_id,
         }
 
     def perform_handshake(self) -> int:
