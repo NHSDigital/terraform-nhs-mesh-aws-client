@@ -13,18 +13,19 @@ class MeshLockManagerApplication(MESHLambdaApplication):
 
     def start(self):
         print(self.operation)
-        if self.execution_id and self.lock_name:
-            if self.operation == "remove":
+        print(type(self.operation))
+        if self.operation == "remove":
+            if self.execution_id and self.lock_name:
                 self._release_lock(
                     self.lock_name,
                     self.execution_id,
                 )
-        else:
-            self.log_object.write_log(
-                "MESHSEND0015",
-                None,
-                {"lock_name": self.lock_name, "owner_id": self.execution_id},
-            )
+            else:
+                self.log_object.write_log(
+                    "MESHSEND0015",
+                    None,
+                    {"lock_name": self.lock_name, "owner_id": self.execution_id},
+                )
         return
 
     def process_event(self, event):
@@ -32,6 +33,7 @@ class MeshLockManagerApplication(MESHLambdaApplication):
         event_detail = event.get("EventDetail", {})
         operation = event.get("Operation")
         self.operation = self.EVENT_TYPE(operation).raw_event
+        print(self.operation)
         return self.EVENT_TYPE(event_detail)
 
 
