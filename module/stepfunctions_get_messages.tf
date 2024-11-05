@@ -139,7 +139,7 @@ resource "aws_sfn_state_machine" "get_messages" {
         Type    = "Choice"
       }
       "Poll complete release lock" = {
-        Next = "Poll complete"
+        Next       = "Poll complete"
         OutputPath = "$.Payload"
         Parameters = {
           FunctionName = "${aws_lambda_function.lock_manager.arn}:${aws_lambda_function.lock_manager.version}"

@@ -1,5 +1,5 @@
 locals {
-    lock_manager_name = "${local.name}-lock-manager"
+  lock_manager_name = "${local.name}-lock-manager"
 }
 
 resource "aws_lambda_function" "lock_manager" {
@@ -15,7 +15,7 @@ resource "aws_lambda_function" "lock_manager" {
   publish = true
 
   environment {
-      variables = local.common_env_vars
+    variables = local.common_env_vars
   }
 
   dynamic "vpc_config" {
@@ -26,13 +26,13 @@ resource "aws_lambda_function" "lock_manager" {
     }
   }
 
-  depends_on = [ 
-      aws_cloudwatch_log_group.lock_manager,
-    ]
+  depends_on = [
+    aws_cloudwatch_log_group.lock_manager,
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "lock_manager" {
-  name = "/aws/lambda/${local.lock_manager_name}"
+  name              = "/aws/lambda/${local.lock_manager_name}"
   retention_in_days = var.cloudwatch_retention_in_days
   kms_key_id        = aws_kms_key.mesh.arn
   lifecycle {
@@ -59,5 +59,89 @@ data "aws_iam_policy_document" "lock_manager_assume" {
         "lambda.amazonaws.com",
       ]
     }
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lock_manager" {
+  role       = aws_iam_role.lock_manager.name
+  policy_arn = aws_iam_policy.lock_manager.arn
+}
+
+resource "aws_iam_policy" "lock_manager" {
+  name        = "${local.lock_manager_name}-policy"
+  description = "${local.lock_manager_name}-policy"
+  policy      = data.aws_iam_policy_document.lock_manager.json
+}
+
+data "aws_iam_policy_document" "lock_manager" {
+  statement {
+    sid    = "CloudWatchAllow"
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+
+    resources = [
+      "${aws_cloudwatch_log_group.lock_manager.arn}*"
+    ]
+  }
+
+  statement {
+    sid    = "SSMDescribe"
+    effect = "Allow"
+
+    actions = [
+      "ssm:DescribeParameters"
+    ]
+
+    resources = [
+      "arn:aws:ssm:eu-west-2:${var.account_id}:parameter/${local.name}/*"
+    ]
+  }
+
+  statement {
+    sid    = "SSMGet"
+    effect = "Allow"
+
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParametersByPath"
+    ]
+
+    resources = [
+      "arn:aws:ssm:eu-west-2:${var.account_id}:parameter/${local.name}/*",
+      "arn:aws:ssm:eu-west-2:${var.account_id}:parameter/${local.name}"
+    ]
+  }
+
+  statement {
+    sid    = "KMSDecrypt"
+    effect = "Allow"
+
+    actions = [
+      "kms:Decrypt"
+    ]
+
+    resources = concat(
+      [aws_kms_alias.mesh.target_key_arn],
+      var.use_secrets_manager ? local.secrets_kms_key_arns : []
+    )
+  }
+
+  statement {
+    sid    = "DynamoDBDelete"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:DeleteItem"
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table${local.locktable_name}"
+    ]
   }
 }
