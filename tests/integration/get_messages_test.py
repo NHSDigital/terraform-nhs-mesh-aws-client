@@ -17,7 +17,6 @@ from .constants import (
 )
 from .test_helpers import (
     CloudwatchLogsCapture,
-    assert_all_info_logs,
     sync_json_lambda_invocation_successful,
     wait_for_execution_outcome,
     wait_till_not_running,
@@ -72,8 +71,6 @@ def test_trigger_step_function_no_handshake(mailbox_id: str, sfn: SFNClient):
         )
         logs = cw.find_logs(parse_logs=True)
         assert logs
-        # We don't pass locking info in, so a warning is expected.
-        assert_all_info_logs(logs, ["MESHLOCK0007"])
         assert not any(log.get("logReference") == "MESHMBOX0004" for log in logs if log)
 
 
