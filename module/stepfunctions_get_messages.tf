@@ -145,7 +145,7 @@ resource "aws_sfn_state_machine" "get_messages" {
           FunctionName = "${aws_lambda_function.lock_manager.arn}:${aws_lambda_function.lock_manager.version}"
           Payload = {
             "EventDetail.$" = "$"
-            "Operation"     = "remove"
+            "Operation"     = "release"
           }
         }
         Resource = "arn:aws:states:::lambda:invoke"

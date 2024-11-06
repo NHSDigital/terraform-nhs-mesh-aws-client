@@ -8,13 +8,16 @@ class MeshLockManagerApplication(MESHLambdaApplication):
 
     def initialise(self):
         self.response = self.event.raw_event
-        self.lock_name = self.event.get("lock_name") or None
-        self.execution_id = self.event.get("execution_id") or None
+        self.body = self.event.get("body")
+        self.lock_name = self.body.get("lock_name") or None
+        self.execution_id = self.body.get("execution_id") or None
 
     def start(self):
         print(self.operation)
         print(type(self.operation))
-        if self.operation == "remove":
+        if self.operation == "release":
+            print(self.execution_id)
+            print(self.lock_name)
             if self.execution_id and self.lock_name:
                 self._release_lock(
                     self.lock_name,

@@ -26,6 +26,7 @@ from integration.constants import (
     FETCH_LOG_GROUP,
     GET_MESSAGES_SFN_ARN,
     LOCAL_MAILBOXES,
+    LOCK_LOG_GROUP,
     MB,
     POLL_FUNCTION,
     POLL_LOG_GROUP,
@@ -34,7 +35,6 @@ from integration.constants import (
 )
 from integration.test_helpers import (
     CloudwatchLogsCapture,
-    assert_all_info_logs,
     sync_json_lambda_invocation_successful,
     temp_lock_row,
     temp_mapping_for_s3_object,
@@ -192,7 +192,6 @@ def test_send_receive_with_metadata(
         logs = cw.find_logs(parse_logs=True)
 
     assert logs
-    assert_all_info_logs(logs, ["MESHLOCK0007"])
 
     payload, _ = sync_json_lambda_invocation_successful(response)
     assert payload
@@ -331,7 +330,6 @@ def test_send_receive_with_metadata_all_settings(
         logs = cw.find_logs(parse_logs=True)
 
     assert logs
-    assert_all_info_logs(logs, ["MESHLOCK0007"])
 
     payload, _ = sync_json_lambda_invocation_successful(response)
     assert payload
@@ -679,7 +677,7 @@ def test_send_locking(
 
         _assert_check_send_params_execution(cw)
 
-        cw.log_group = SEND_LOG_GROUP
+        cw.log_group = LOCK_LOG_GROUP
 
         # Now switch the log group to the "send" lambda and make sure it logged the release correctly
         cw.wait_for_logs(predicate=lambda x: x.get("logReference") == "LAMBDA0003")

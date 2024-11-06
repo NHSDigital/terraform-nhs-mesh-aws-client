@@ -46,8 +46,6 @@ def test_invoke_get_messages_directly(mailbox_id: str, lambdas: LambdaClient):
     assert not body
 
     assert logs
-    # We don't pass locking info in, so a warning is expected.
-    assert_all_info_logs(logs, ["MESHLOCK0007"])
 
 
 @pytest.mark.parametrize("mailbox_id", LOCAL_MAILBOXES)
@@ -143,8 +141,6 @@ def test_invoke_get_when_message_exists(
     assert body["message_count"] == 1
 
     assert logs
-    # We don't pass locking info in, so a warning is expected.
-    assert_all_info_logs(logs, ["MESHLOCK0007"])
 
     received = body["message_list"][0]["body"]
     message_id = received["message_id"]
