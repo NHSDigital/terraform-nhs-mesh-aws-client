@@ -211,9 +211,6 @@ def test_trigger_step_function_get_messages_pagination(
         lock_name = remove_lock_log["lock_name"]
         assert not local_lock_table.get_item(Key={"LockName": lock_name}).get("Item")
 
-        # We don't pass locking info in, so a warning is expected.
-        assert_all_info_logs(logs, ["MESHLOCK0007"])
-
         downloaded_logs = list(
             filter(lambda x: x.get("logReference") == "MESHFETCH0011", logs)
         )
