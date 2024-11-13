@@ -149,10 +149,24 @@ data "aws_iam_policy_document" "check_send_parameters" {
     ]
   }
 
+  statement {
+    sid    = "DynamoDBAccess"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamofb:DeleteItem",
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table${local.locktable_name}"
+    ]
+  }
+
   dynamic "statement" {
     for_each = local.vpc_enabled ? [true] : []
     content {
-
       sid    = "EC2Interfaces"
       effect = "Allow"
 
@@ -216,4 +230,6 @@ data "aws_iam_policy_document" "check_send_parameters_check_sfn" {
       "${replace(aws_sfn_state_machine.send_message.arn, "stateMachine", "execution")}*"
     ]
   }
+
+  
 }
