@@ -157,6 +157,7 @@ data "aws_iam_policy_document" "check_send_parameters" {
       "dynamodb:GetItem",
       "dynamodb:PutItem",
       "dynamofb:DeleteItem",
+      "dynamodb:UpdateItem", 
     ]
 
     resources = [
