@@ -161,7 +161,8 @@ data "aws_iam_policy_document" "send_message_chunk" {
     actions = [
       "dynamodb:GetItem",
       "dynamodb:PutItem",
-      "dynamofb:DeleteItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:UpdateItem", 
     ]
 
     resources = [

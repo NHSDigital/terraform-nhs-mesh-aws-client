@@ -156,7 +156,7 @@ data "aws_iam_policy_document" "check_send_parameters" {
     actions = [
       "dynamodb:GetItem",
       "dynamodb:PutItem",
-      "dynamofb:DeleteItem",
+      "dynamodb:DeleteItem",
       "dynamodb:UpdateItem", 
     ]
 
