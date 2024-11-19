@@ -161,7 +161,7 @@ data "aws_iam_policy_document" "check_send_parameters" {
     ]
 
     resources = [
-      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table/${local.locktable_name}"
+      "arn:aws:dynamodb:eu-west-2:${var.account_id}:table/${local.locktable_name}"
     ]
   }
 

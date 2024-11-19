@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "send_message_chunk" {
     ]
 
     resources = [
-      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table/${local.locktable_name}"
+      "arn:aws:dynamodb:eu-west-2:${var.account_id}:table/${local.locktable_name}"
     ]
   }
 
