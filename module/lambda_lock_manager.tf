@@ -141,7 +141,7 @@ data "aws_iam_policy_document" "lock_manager" {
     ]
 
     resources = [
-      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table${local.locktable_name}"
+      "arn:aws:dynamodb:eu-west-2:${var.account_id}:/table/${local.locktable_name}"
     ]
   }
 }
