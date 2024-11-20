@@ -215,7 +215,9 @@ data "aws_iam_policy_document" "send_message" {
       aws_lambda_function.send_message_chunk.arn,
       "${aws_lambda_function.send_message_chunk.arn}:*",
       aws_lambda_function.check_send_parameters.arn,
-      "${aws_lambda_function.check_send_parameters.arn}:*"
+      "${aws_lambda_function.check_send_parameters.arn}:*",
+      aws_lambda_function.lock_manager.arn,
+      "${aws_lambda_function.lock_manager.arn}:*"
     ]
   }
 }

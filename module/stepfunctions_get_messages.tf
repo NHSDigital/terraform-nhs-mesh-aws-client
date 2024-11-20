@@ -250,7 +250,9 @@ data "aws_iam_policy_document" "get_messages" {
       aws_lambda_function.fetch_message_chunk.arn,
       "${aws_lambda_function.fetch_message_chunk.arn}:*",
       aws_lambda_function.poll_mailbox.arn,
-      "${aws_lambda_function.poll_mailbox.arn}:*"
+      "${aws_lambda_function.poll_mailbox.arn}:*",
+      aws_lambda_function.lock_manager.arn,
+      "${aws_lambda_function.lock_manager.arn}:*"
     ]
 
     actions = ["lambda:InvokeFunction"]
