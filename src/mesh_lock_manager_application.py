@@ -13,11 +13,7 @@ class MeshLockManagerApplication(MESHLambdaApplication):
         self.execution_id = self.body.get("execution_id") or None
 
     def start(self):
-        print(self.operation)
-        print(type(self.operation))
         if self.operation == "release":
-            print(self.execution_id)
-            print(self.lock_name)
             if self.execution_id and self.lock_name:
                 self._release_lock(
                     self.lock_name,
@@ -32,11 +28,9 @@ class MeshLockManagerApplication(MESHLambdaApplication):
         return
 
     def process_event(self, event):
-        print("EVENT", event)
         event_detail = event.get("EventDetail", {})
         operation = event.get("Operation")
         self.operation = self.EVENT_TYPE(operation).raw_event
-        print(self.operation)
         return self.EVENT_TYPE(event_detail)
 
 
